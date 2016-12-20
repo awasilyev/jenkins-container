@@ -32,14 +32,12 @@
     name: "/tmp/jenkins.rpm"
     state: installed
   when: specific_version.stat.exists
-  notify: configure default users
 
 - name: Validate Jenkins is installed and register package name.
   package:
     name: jenkins
     state: present
   when: not specific_version.stat.exists
-  notify: configure default users
 
 - name: Install Jenkins from repository.
   package:
