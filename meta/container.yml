@@ -1,0 +1,13 @@
+jenkins:
+  image: centos:7
+  entrypoint: ['/entrypoint.sh']
+  working_dir: /
+  user: jenkins
+  environment:
+    - JENKINS_HOSTNAME="localhost"
+    - JENKINS_PLUGINS=""
+    - JENKINS_ADMIN_USERNAME="admin"
+    - JENKINS_ADMIN_PASSWORD="admin"
+    - JENKINS_JAVA_OPTIONS="-Djenkins.install.runSetupWizard=false"
+  ports:
+    - 8080:8080

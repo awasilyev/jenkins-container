@@ -1,0 +1,36 @@
+- name: Build the project  
+  hosts: localhost
+  connection: local
+  gather_facts: no
+  tasks:
+
+  - name: Remove ansible directory and any .out files 
+    file:
+      path: "{{ item }}"
+      state: absent
+    with_items:
+      - ./ansible
+      - build.out
+      - playbook.out
+      - symfony
+
+  - name: Init the ansible directory 
+    command: ansible-container init
+    
+  - name: Install this role with latest commit   
+    shell: "ansible-container install git+https://github.com/awasilyev/jenkins-container.git,$(git rev-parse HEAD) | tee ./build.out"
+      
+  - name: Build the project
+    shell: ansible-container --from-scratch --debug build 2>&1 | tee -a ./build.out
+    register: output
+    ignore_errors: yes
+
+  - name: Check if build passed
+    shell: grep unreachable=0 build.out | grep failed=0
+    register: checkifpassed
+    ignore_errors: yes
+    changed_when: false
+
+  - assert:
+      that: checkifpassed.rc == 0 
+
