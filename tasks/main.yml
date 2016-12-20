@@ -3,12 +3,15 @@
 - include: setup.yml
 
 - name: Add entrypoint script
-  copy:
-   src: entrypoint.sh
-   dest: /entrypoint.sh
+  template:
+   src: "{{ item }}.j2"
+   dest: "/{{ item }}"
    owner: root
    group: root
    mode: 0775
+  with_items:
+   - entrypoint.sh
+   - start_jenkins.sh
 
 - name: Create custom init scripts directory.
   file:
@@ -19,8 +22,11 @@
     mode: 0775
 
 # Make sure Jenkins starts, then configure Jenkins.
-- name: Ensure Jenkins is started and runs on startup.
-  service: name=jenkins state=started 
+- name: Start jenkins
+  shell: bash -c "/start_jenkins.sh &"
+  become_user: jenkins
+  register: out
+- debug: var=out
 
 - name: Wait for Jenkins to start up before proceeding.
   shell: "curl -D - --silent --max-time 5 http://{{ jenkins_hostname }}:{{ jenkins_http_port }}/cli/"
@@ -39,6 +45,10 @@
   retries: 5
   delay: 10
 
+# Fix owner
+- name: Fix owner
+  shell: chown -R jenkins /var/lib/jenkins
+
 # Stop jenkins
-- name: Ensure Jenkins is started and runs on startup.
-  service: name=jenkins state=stopped
+- name: Stop jenkins
+  shell: killall -15 java

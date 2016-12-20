@@ -21,7 +21,7 @@
     shell: "ansible-container install git+https://github.com/awasilyev/jenkins-container.git,$(git rev-parse HEAD) | tee ./build.out"
       
   - name: Build the project
-    shell: ansible-container --from-scratch --debug build 2>&1 | tee -a ./build.out
+    shell: ansible-container --debug build 2>&1 | tee -a ./build.out
     register: output
     ignore_errors: yes
 

@@ -4,6 +4,10 @@
     name: 
       - curl
       - libselinux-python
+      - java-1.8.0-openjdk-headless
+      - dejavu-sans-fonts
+      - fontconfig
+      - psmisc
     state: installed
 
 - name: Ensure Jenkins repo is installed.

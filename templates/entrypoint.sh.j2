@@ -1,0 +1,25 @@
+#!/bin/sh
+
+cat >{{ jenkins_home }}/init.groovy.d/basic-security.groovy <<EOT 
+#!groovy
+import hudson.security.*
+import jenkins.model.*
+
+def instance = Jenkins.getInstance()
+
+println "--> Checking if security has been set already"
+
+if (!instance.isUseSecurity()) {
+    println "--> creating local user ${JENKINS_ADMIN_USERNAME}"
+
+    def hudsonRealm = new HudsonPrivateSecurityRealm(false)
+    hudsonRealm.createAccount('${JENKINS_ADMIN_USERNAME}', '${JENKINS_ADMIN_PASSWORD}')
+    instance.setSecurityRealm(hudsonRealm)
+
+    def strategy = new FullControlOnceLoggedInAuthorizationStrategy()
+    instance.setAuthorizationStrategy(strategy)
+    instance.save()
+}
+EOT
+
+exec /start_jenkins.sh $*
