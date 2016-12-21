@@ -1,16 +1,22 @@
 #!/bin/bash
-set -x
+set -m
+
+exec java -DJENKINS_HOME={{ jenkins_home }} -Djenkins.install.runSetupWizard=false -Djava.awt.headless=true -jar /usr/lib/jenkins/jenkins.war ${JENKINS_JAVA_OPTIONS} --httpPort={{ jenkins_http_port }} --webroot=/var/cache/jenkins/war  "$@" &
+
+while ! timeout 1 bash -c "echo > /dev/tcp/localhost/{{ jenkins_http_port }}"; do echo waiting; sleep 10; done
 
 mkdir -p {{ jenkins_home }}
 curl -L https://updates.jenkins-ci.org/update-center.json | sed '1d;$d' > "{{ jenkins_home }}/updates/default.json"
 
-IFS=","
-for p in ${JENKINS_PLUGINS}; do
- java -jar {{ jenkins_jar_location }} -s http://{{ jenkins_hostname }}:{{ jenkins_http_port }}{{ jenkins_url_prefix | default('') }}/
-    install-plugin $p
-    --username ${JENKINS_USERNAME}
-    --password ${JENKINS_PASSWORD}
-done
-
-exec java -DJENKINS_HOME={{ jenkins_home }} -Djava.awt.headless=true -jar /usr/lib/jenkins/jenkins.war --httpPort={{ jenkins_http_port }} --webroot=/var/cache/jenkins/war  $*
-#while ! timeout 1 bash -c "echo > /dev/tcp/localhost/{{ jenkins_http_port }}"; do sleep 10; done
+if [ "${JENKINS_PLUGINS}" == "" ]; then
+  fg
+else 
+  IFS=","
+  for p in ${JENKINS_PLUGINS}; do
+   echo adding $p
+   java -jar {{ jenkins_jar_location }} -s http://{{ jenkins_hostname }}:{{ jenkins_http_port }}{{ jenkins_url_prefix | default('') }}/ install-plugin $p --username $JENKINS_ADMIN_USERNAME --password $JENKINS_ADMIN_PASSWORD 
+   echo done
+  done
+  java -jar {{ jenkins_jar_location }} -s http://{{ jenkins_hostname }}:{{ jenkins_http_port }}{{ jenkins_url_prefix | default('') }}/ safe-restart --username $JENKINS_ADMIN_USERNAME --password $JENKINS_ADMIN_PASSWORD 
+  fg
+fi

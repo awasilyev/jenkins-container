@@ -1,0 +1,4 @@
+---
+JENKINS_PLUGINS: greenballs,rebuild
+JENKINS_ADMIN_USERNAME: test_user
+JENKINS_ADMIN_PASSWORD: test_pass

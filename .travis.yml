@@ -31,16 +31,11 @@ script:
   - ansible-container install git+https://github.com/${TRAVIS_REPO_SLUG},${TRAVIS_COMMIT}
 
   # Build the service image
-  - ansible-container build
+  - ansible-container build 
 
   # Start the service
-  - ansible-container run -d
+  - ansible-container --var-file=test_var.yml run -d
   - docker ps
 
   # Run tests
   - ansible-playbook test.yml
-
-notifications:
-  email: false
-  webhooks: https://galaxy.ansible.com/api/v1/notifications/
-
