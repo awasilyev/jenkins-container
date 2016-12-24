@@ -1,4 +1,4 @@
-Memcached
+Jenkins CI
 =========
 
 [![Build Status](https://travis-ci.org/awasilyev/jenkins-container.svg?branch=master)](https://travis-ci.org/awasilyev/jenkins-container)
