@@ -1,11 +1,10 @@
-Jenkins CI
-=========
-
 [![Build Status](https://travis-ci.org/awasilyev/jenkins-container.svg?branch=master)](https://travis-ci.org/awasilyev/jenkins-container)
 
-Use this role to add a jenkins CI/CD service to your Ansible Container project. See Role Variables below for how to set the jenkins hostname, plugins, admin credentials and java opts. You can pass additional jenkins options as command for this container. Connect to the jenkins on port 8080.
+# Jenkins CI
 
-Run the following commands to install the service:
+Use this role to add a jenkins CI/CD service to your Ansible Container project.
+
+Run the following to install the service:
 
 ```
 # Set the working directory to your Ansible Container project root
@@ -15,66 +14,56 @@ $ cd myproject
 $ ansible-container install awasilyev.jenkins-container
 ```
 
-Envrionment Variables
----------------------
+## Post Installation
 
-Set the following environment variables in `container.yml`:
+### Connecting 
 
-JENKINS_HOSTNAME
-> jenkins hostname (default: "localhost")
+In `container.yml` the Jenkins server port is mapped to host port **8080**. If you're using Docker Engine or Docker for Mac to run the service, connect to the web console at [http://localhost:8080](http://localhost:8080).
 
-JENKINS_PLUGINS
-> comma-separated list of plugins (default: "")
+### Persisting data
 
-JENKINS_ADMIN_USERNAME
-> username for jenkins admin user (default "admin")
+Jenkins data, plugins, artifacts, etc. are written to */var/lib/jenkins*. During container runtime, if you want to persist this data, add a *volume* directive to `container.yml` that maps a host path or named volume to this path. 
 
-JENKINS_ADMIN_PASSWORD
-> password for jenkins admin user (default "admin")
+### Configuring
 
-JENKINS_JAVA_OPTIONS
-> additional options for java (default: "-Djenkins.install.runSetupWizard=false")
+On startup the *jenkins* container executes */usr/bin/startup_jenkins.sh* to install plugins, and launch the Jenkins process. Any parameters passed to this script via the *command* directive in `container.yml` will be appended to the `java` command used to launch Jenkins. View [start_jenkins.sh.j2](./templates/start_jenkins.sh.j2) for a look at the template used to create this script during image build.
 
-Role Variables
---------------
+See Environment Variables, and Role Variables below for details on setting the admin credentials, installing plugins, passing additional Java options, and determining the Jenkins version to install. 
 
-Set the following variables in `main.yml`: 
+## Environment Variables
 
-jenkins_version:
-> Set the version to install, for example: 2.37 This is left undefined by default, which causes the latest version to be installed. 
+The following variables are defined in `container.yml`, and set as environment variables in the *jenkins* container:
 
-jenkins_hostname: localhost
-> Set the hostname.
+JENKINS_ADMIN_USERNAME: admin
+> Set the username for jenkins admin user.
 
-jenkins_url_prefix: ""
-> Set the value of *--prefix* in the Jenkins initialization java invocation, creating an access path like *http://www.example.com{{ jenkins_url_prefix }}*. Be sure to start the prefix with a '/' (i.e. */jenkins*).
+JENKINS_ADMIN_PASSWORD: admin
+> Set the password for jenkins admin user.
 
-jenkins_http_port: 8080
-> Port for accessing the Jenkins web interface.
+JENKINS_JAVA_OPTIONS: ""
+> Provide additional options to the `java` command used to launch Jenkins in the container startup script, */start_jenkins.sh*.
 
-jenkins_connection_delay: 5
-jenkins_connection_retries: 60
-> Set the number of tries, and the amount of time between each try, while attempting to connect to Jenkins after initial startup. Total time spent waiting on equals retries * delay, or if using the default values, 300 seconds.
-
-jenkins_home: /var/lib/jenkins
-> Set the path where artifacts, workspace, and plugins will be stored.
-
-jenkins_jar_location: /opt/jenkins-cli.jar
-> Path where *jenkins-cli.jar* will be kept.
+JENKINS_PLUGINS: ""
+> Provide a comma-separated list of plugins.
 
 
-Dependencies
-------------
+## Role Variables
+
+jenkins_version: latest 
+> Set to a specific version of Jenkins to install during image build, or 'latest' to install the latest version. 
+
+jenkins_dependencies: []
+> List of packages to be installed during image build. The list in [defaults/main.yml](./defaults/main.yml), will be added to the project `main.yml` when the role installed. Add any additional packages that may be required by any plugins you plan to install. For example, if you plan to install the *git* plugin, it depends on the *git* package being installed.
+
+## Dependencies
 
 None.
 
-License
--------
+## License
 
 MIT/BSD
 
-Author Information
-------------------
+## Author Information
 
 [@awasilyev](https://github.com/awasilyev)
 

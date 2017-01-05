@@ -5,7 +5,7 @@
 - name: Add entrypoint script
   template:
    src: "{{ item }}.j2"
-   dest: "/{{ item }}"
+   dest: "/usr/bin/{{ item }}"
    owner: root
    group: root
    mode: 0775
@@ -23,7 +23,7 @@
 
 # Make sure Jenkins starts, then configure Jenkins.
 - name: Start jenkins
-  shell: bash -c "/start_jenkins.sh &"
+  shell: bash -c "/usr/bin/start_jenkins.sh &"
   become_user: jenkins
 
 - name: Wait for Jenkins to start up before proceeding.

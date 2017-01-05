@@ -1,10 +1,8 @@
-# it will use latest jenkins if this is undefined
-#jenkins_version: 2.37
-
-jenkins_hostname: localhost
-jenkins_url_prefix: ""
-jenkins_http_port: 8080
-jenkins_connection_delay: 5
-jenkins_connection_retries: 60
-jenkins_home: /var/lib/jenkins
-jenkins_jar_location: /opt/jenkins-cli.jar
+jenkins_version: latest
+jenkins_dependencies:
+  - curl
+  - libselinux-python
+  - java-1.8.0-openjdk-headless
+  - dejavu-sans-fonts
+  - fontconfig
+  - psmisc
