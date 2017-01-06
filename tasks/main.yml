@@ -2,7 +2,7 @@
 # Setup/install tasks.
 - include: setup.yml
 
-- name: Add entrypoint script
+- name: Add entrypoint scripts
   template:
    src: "{{ item }}.j2"
    dest: "/usr/bin/{{ item }}"
@@ -12,14 +12,6 @@
   with_items:
    - entrypoint.sh
    - start_jenkins.sh
-
-- name: Create custom init scripts directory.
-  file:
-    path: "{{ jenkins_home }}/init.groovy.d"
-    state: directory
-    owner: jenkins
-    group: jenkins
-    mode: 0775
 
 # Make sure Jenkins starts, then configure Jenkins.
 - name: Start jenkins
@@ -46,15 +38,30 @@
 - name: Stop jenkins
   shell: killall -15 java
 
-- name: Fix directory ownership
-  shell: chown -R jenkins:root {{ item }}
+- name: Remove jenkins directories 
+  file:
+    path: "{{ item }}" 
+    state: absent
   with_items:
-    - /var/lib/jenkins
+    - "{{ jenkins_home }}"
     - /var/cache/jenkins
 
-- name: Fix directory permissions 
-  shell: chmod 775 {{ item }}
+- name: Recreate jenkins directories with correct ownership 
+  file:
+    path: "{{ item }}"
+    owner: jenkins
+    group: root
+    mode: 0775
+    state: directory
   with_items:
-    - /var/lib/jenkins
+    - "{{ jenkins_home }}"
     - /var/cache/jenkins
+
+- name: Create custom init scripts directory.
+  file:
+    path: "{{ jenkins_home }}/init.groovy.d"
+    state: directory
+    owner: jenkins
+    group: root 
+    mode: 0775
 

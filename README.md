@@ -22,7 +22,9 @@ In `container.yml` the Jenkins server port is mapped to host port **8080**. If y
 
 ### Persisting data
 
-Jenkins data, plugins, artifacts, etc. are written to */var/lib/jenkins*. During container runtime, if you want to persist this data, add a *volume* directive to `container.yml` that maps a host path or named volume to this path. 
+Jenkins data, plugins, artifacts, etc. are written to */var/lib/jenkins*. During container runtime, if you want to persist this data between container runs, add a *volume* directive to `container.yml` that maps a host path or named volume to this path. 
+
+During the build process */var/lib/jenkins* is destroyed and recreated, thus clearing any existing Jenkins data. This is done so that if the service is deployed to a cluster, such as OpenShift, where the service is not gauranteed to run as user *jenkins*, there won't be any secret or key files left over from the build process that are exclusively read-only by the *jenkins* user. So for obvious reasons, do not mount a volume to this path during the image build.
 
 ### Configuring
 
