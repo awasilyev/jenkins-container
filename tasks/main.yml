@@ -43,10 +43,18 @@
   retries: 5
   delay: 10
 
-# Fix owner
-- name: Fix owner
-  shell: chown -R jenkins /var/lib/jenkins
-
-# Stop jenkins
 - name: Stop jenkins
   shell: killall -15 java
+
+- name: Fix directory ownership
+  shell: chown -R jenkins:root {{ item }}
+  with_items:
+    - /var/lib/jenkins
+    - /var/cache/jenkins
+
+- name: Fix directory permissions 
+  shell: chmod 775 {{ item }}
+  with_items:
+    - /var/lib/jenkins
+    - /var/cache/jenkins
+
