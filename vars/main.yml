@@ -3,5 +3,10 @@ jenkins_repo_url: http://pkg.jenkins.io/redhat/jenkins.repo
 jenkins_repo_key_url: http://pkg.jenkins.io/redhat/jenkins.io.key
 jenkins_pkg_url: http://pkg.jenkins.io/redhat
 jenkins_java_options_env_var: JENKINS_JAVA_OPTIONS
-
+jenkins_hostname: localhost
+jenkins_url_prefix: ""
+jenkins_http_port: 8080
 jenkins_home: /var/lib/jenkins
+jenkins_jar_location: /opt/jenkins-cli.jar
+jenkins_connection_delay: 3
+jenkins_connection_retries: 40

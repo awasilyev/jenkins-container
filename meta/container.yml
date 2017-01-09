@@ -1,13 +1,18 @@
 jenkins:
   image: centos:7
-  entrypoint: ['/entrypoint.sh']
+  entrypoint: ['/usr/bin/entrypoint.sh']
+  command: ['/usr/bin/dumb-init', '/usr/bin/start_jenkins.sh']
   working_dir: /
   user: jenkins
   environment:
-    JENKINS_HOSTNAME: '{{ JENKINS_HOSTNAME | default("localhost") }}' 
-    JENKINS_ADMIN_USERNAME: '{{ JENKINS_ADMIN_USERNAME | default("admin") }}'
-    JENKINS_ADMIN_PASSWORD: '{{ JENKINS_ADMIN_PASSWORD | default("admin") }}'
-    JENKINS_JAVA_OPTIONS: '{{ JENKINS_JAVA_OPTIONS }}'
-    JENKINS_PLUGINS: '{{ JENKINS_PLUGINS }}'
+    JENKINS_ADMIN_USERNAME: admin
+    JENKINS_ADMIN_PASSWORD: admin
+    JENKINS_JAVA_OPTIONS: ''
+    JENKINS_PLUGINS: ''
   ports:
-    - 8080:8080
+  - 8080:8080
+
+  # Optionally persist Jenkins data, artifacts, plugins, etc.
+  #dev_overrides:
+  #  volumes:
+  #   - <host-path>:/var/lib/jenkins

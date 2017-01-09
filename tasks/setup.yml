@@ -1,14 +1,9 @@
 ---
 - name: Ensure dependencies are installed.
   package:
-    name: 
-      - curl
-      - libselinux-python
-      - java-1.8.0-openjdk-headless
-      - dejavu-sans-fonts
-      - fontconfig
-      - psmisc
+    name: "{{ item }}"
     state: installed
+  with_items: "{{ jenkins_dependencies }}"
 
 - name: Ensure Jenkins repo is installed.
   get_url:
@@ -24,7 +19,7 @@
   get_url:
     url: "{{ jenkins_pkg_url }}/jenkins-{{ jenkins_version }}-1.1.noarch.rpm"
     dest: "/tmp/jenkins.rpm"
-  when: jenkins_version is defined
+  when: jenkins_version != 'latest'
 
 - name: Check if we downloaded a specific version of Jenkins.
   stat:
@@ -47,4 +42,19 @@
   package:
     name: jenkins
     state: installed
-  when: jenkins_version is undefined
+  when: jenkins_version == 'latest' 
+
+- name: Update jenkins user
+  user:
+    name: jenkins
+    uid: 1000
+    groups: root
+    append: yes
+
+- name: Install dumb init
+  get_url:
+    url: https://github.com/Yelp/dumb-init/releases/download/v1.2.0/dumb-init_1.2.0_amd64
+    dest: /usr/bin/dumb-init
+    owner: root
+    group: root
+    mode: 0775
