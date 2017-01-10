@@ -3,6 +3,7 @@
 ansible-playbook build.yml
 
 if [ "$?" == "0" ]; then
+    ./update.sh
     ansible-container run
 else
     cat build.out

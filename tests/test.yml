@@ -6,15 +6,16 @@
   vars:
     jenkins_hostname: 127.0.0.1
     jenkins_http_port: 8080
-    jenkins_jar_location: /opt/jenkins-cli.jar
-  vars_files:
-    - test_var.yml
+    jenkins_jar_location: "{{ playbook_dir }}/jenkins-cli.jar"
+    jenkins_admin_username: admin
+    jenkins_admin_password: admin
+
   tasks:
     - name: Wait for service to be available
       wait_for:
         host: "{{ jenkins_hostname }}"
         port: "{{ jenkins_http_port }}"
-        delay: 20
+        delay: 30
         timeout: 120 
       ignore_errors: yes
 
@@ -27,12 +28,17 @@
       retries: 15
       delay: 20
 
+    - debug: var=jarfile_get
 
-    - shell: java -jar {{ jenkins_jar_location }} -s http://{{ jenkins_hostname }}:{{ jenkins_http_port }}{{ jenkins_url_prefix | default('') }}/ list-plugins  --username {{ JENKINS_ADMIN_USERNAME }} --password {{ JENKINS_ADMIN_PASSWORD }}
+    - shell: >
+        java -jar {{ jenkins_jar_location }} \
+        -s http://{{ jenkins_hostname }}:{{ jenkins_http_port }}/ \
+        list-plugins \
+        --username {{ jenkins_admin_username }} \
+        --password {{ jenkins_admin_password }} \
       register: out
-      until: out.stdout.find("greenball") != -1
-      retries: 5
-      delay: 10
+
+    - debug: var=out.stdout_lines
 
     - assert:
-        that: out.stdout.find("greenball") != -1
+        that: out.stdout.find("greenballs") != -1
