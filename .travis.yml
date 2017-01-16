@@ -33,8 +33,11 @@ script:
   # Build the service image
   - ansible-container build 
 
+  # Update container.yml to test installing a plugin
+  - ./update.sh
+
   # Start the service
-  - ansible-container --var-file=test_var.yml run -d
+  - ansible-container run -d
   - docker ps
 
   # Run tests
